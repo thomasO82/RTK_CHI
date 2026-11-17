@@ -1,5 +1,7 @@
 # RecipesI7 — TD5 : TanStack Query
 
+Le calendrier utilise FullCalendar React v7 et `temporal-polyfill`. Les plugins, le thème classic et les styles sont importés ensemble dans `Planning.jsx`. Installation : `npm install @fullcalendar/react@^7 temporal-polyfill`.
+
 Application React adaptée progressivement aux cinq TD. Cette branche `td5-tanstack-query` part du TD3 et ajoute la gestion des lectures TheMealDB avec TanStack Query.
 
 | Branche | Contenu ajouté |

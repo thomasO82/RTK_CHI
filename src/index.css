@@ -84,5 +84,5 @@ input { max-width: 100%; font: inherit; }
   main > section #categories { padding: 1rem; border-radius: 1rem; }
   #recipe { flex-direction: column; }
   #recipe > img, #recipe > aside { width: 100%; }
-  .fc .fc-header-toolbar { flex-wrap: wrap; gap: .5rem; }
+  .planningToolbar { flex-wrap: wrap; gap: .5rem; }
 }

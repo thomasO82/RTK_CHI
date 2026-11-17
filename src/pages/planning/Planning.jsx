@@ -1,5 +1,10 @@
-import dayGridPlugin from '@fullcalendar/daygrid'
 import FullCalendar from '@fullcalendar/react'
+import dayGridPlugin from '@fullcalendar/react/daygrid'
+import themePlugin from '@fullcalendar/react/themes/classic'
+import '@fullcalendar/react/skeleton.css'
+import '@fullcalendar/react/themes/classic/theme.css'
+import '@fullcalendar/react/themes/classic/palette.css'
+
 import { useState } from 'react'
 import { useMealPlan } from '../../store/useMealPlan'
 import useToggle from '../../hooks/useToggle'
@@ -34,14 +39,14 @@ export default function Planning() {
       <h2>Planning</h2>
       {!events.length && <p>Aucune recette planifiée.</p>}
       <FullCalendar
-        plugins={[dayGridPlugin]}
+        plugins={[themePlugin, dayGridPlugin]}
         events={events}
         initialView="dayGridMonth"
         headerToolbar={{
-          left: 'title',
-          center: '',
-          right: 'prev,next today',
+          start: 'title',
+          end: 'prev,next today',
         }}
+        headerToolbarClass="planningToolbar"
         eventClick={showEvent}
         height="auto"
       />
