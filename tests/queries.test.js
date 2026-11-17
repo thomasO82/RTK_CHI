@@ -48,7 +48,7 @@ test('catégories, catégories de recettes, recherches et fiches ont des caches 
   ])
 })
 
-test('la fiche et la modale partagent une requête et réutilisent le cache frais', async () => {
+test('les appels simultanés sont partagés puis les données en cache sont actualisées', async () => {
   let calls = 0
   axios.get = async () => {
     calls++
@@ -61,8 +61,17 @@ test('la fiche et la modale partagent une requête et réutilisent le cache frai
   ])
   assert.deepEqual(details, { meals: [{ idMeal: '42', strMeal: 'Soupe' }] })
   assert.deepEqual(modal, details)
-  assert.deepEqual(await queryClient.fetchQuery(recipeQuery('42')), details)
   assert.equal(calls, 1)
+  assert.deepEqual(queryClient.getQueryData(recipeQuery('42').queryKey), details)
+
+  axios.get = async () => {
+    calls++
+    return { data: { meals: [{ idMeal: '42', strMeal: 'Soupe corrigée' }] } }
+  }
+  assert.deepEqual(await queryClient.fetchQuery(recipeQuery('42')), {
+    meals: [{ idMeal: '42', strMeal: 'Soupe corrigée' }],
+  })
+  assert.equal(calls, 2)
 })
 
 test('une erreur réseau reste une erreur de requête et une nouvelle tentative peut réussir', async () => {

@@ -27,13 +27,13 @@ Les composants Categories, Recipes, RecipeDetails et RecipeModal utilisent `useQ
 | Fiche et ingrédients de la modale | `['recipe', id]` |
 
 Chaque composant distingue le chargement (`isPending`), l'erreur (`isError`) et le résultat vide. Un bouton Réessayer relance une requête en erreur.
-Les données sont considérées fraîches pendant une minute (`staleTime: 60_000`) : rouvrir une fiche ou sa modale réutilise alors le cache sans nouvel appel HTTP. Une requête en échec est retentée une fois (`retry: 1`).
+La durée de fraîcheur utilise le comportement par défaut de TanStack Query : les données sont immédiatement considérées anciennes. Le cache permet de les afficher sans attendre, tandis qu'une nouvelle récupération peut se déclencher au montage, au retour sur la fenêtre ou à la reconnexion. Les appels simultanés pour une même clé restent partagés. Une requête en échec est retentée une fois (`retry: 1`).
 
 ## Inspecter TanStack Query
 
 Lancer `npm run dev`, puis ouvrir le site et cliquer sur l'icône TanStack Query en bas à droite.
 Les Devtools affichent les clés, l'état des requêtes et les données du cache. Elles sont disponibles en développement.
-Choisir une catégorie, lancer une recherche, ouvrir une fiche puis sa modale pour voir les entrées correspondantes. Revenir à la catégorie précédente en moins d'une minute permet de constater la réutilisation du cache dans l'onglet Réseau du navigateur.
+Choisir une catégorie, lancer une recherche, ouvrir une fiche puis sa modale pour voir les entrées correspondantes. Revenir à une catégorie déjà visitée permet de voir les données du cache immédiatement et leur actualisation en arrière-plan dans l'onglet Réseau du navigateur.
 
 ## Planning et courses
 
