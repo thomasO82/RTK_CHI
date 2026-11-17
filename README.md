@@ -35,7 +35,7 @@ Les lectures nécessitent un accès à TheMealDB.
 ## Code simplifié
 
 Les lectures HTTP utilisent Axios. Les données TheMealDB sont retournées telles quelles.
-Les ingrédients sont extraits dans src/store/useMealPlan.js.
+Les fonctions `getIngredients` et `ingredientsForWeek` sont regroupées dans `src/utils/ingredients.js` pour extraire les ingrédients et filtrer ceux de la semaine.
 La modale attribue les identifiants et la date ; le hook Zustand ajoute, modifie ou supprime les données préparées.
 Les champs required du formulaire imposent une date.
 

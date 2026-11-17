@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { useMealPlan, getIngredients } from '../../../store/useMealPlan'
+import { useMealPlan, selectPlanRecipe } from '../../../store/useMealPlan'
+import { getIngredients } from '../../../utils/ingredients'
 import { getRecipeById } from '../../../services/theMealDbApi'
 export default function RecipeModal({ recipe, onClose }) {
   const [result, setResult] = useState({
@@ -16,11 +17,9 @@ export default function RecipeModal({ recipe, onClose }) {
         setResult({ error, isError: true })
       })
   }, [recipe.idMeal])
-  
+
   const meal = result.data?.meals?.[0]
-  const planRecipe = useMealPlan((state) => {
-    return state.planRecipe
-  })
+  const planRecipe = useMealPlan(selectPlanRecipe)
   const submit = (event) => {
     event.preventDefault()
     const date = new Date(

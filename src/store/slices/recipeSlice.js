@@ -1,3 +1,5 @@
+export const selectPlanRecipe = (state) => state.planRecipe
+
 export const createRecipeSlice = (set) => ({
   recipes: [],
 

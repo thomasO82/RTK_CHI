@@ -1,4 +1,5 @@
-import { useMealPlan, ingredientsForWeek } from '../../store/useMealPlan'
+import { useMealPlan } from '../../store/useMealPlan'
+import { ingredientsForWeek } from '../../utils/ingredients'
 import IngredientCard from './IngredientCard'
 import './courses.css'
 export default function Courses() {

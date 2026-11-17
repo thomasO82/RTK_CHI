@@ -1,6 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { useMealPlan, ingredientsForWeek, getIngredients } from '../src/store/useMealPlan.js'
+import { useMealPlan } from '../src/store/useMealPlan.js'
+import { ingredientsForWeek, getIngredients } from '../src/utils/ingredients.js'
 import { toDateInput } from '../src/utils/dates.js'
 
 test('planifier ajoute la recette et ses ingrédients en une seule notification', () => {
