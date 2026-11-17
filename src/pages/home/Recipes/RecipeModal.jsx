@@ -1,22 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useMealPlan, selectPlanRecipe } from '../../../store/useMealPlan'
 import { getIngredients } from '../../../utils/ingredients'
-import { getRecipeById } from '../../../services/theMealDbApi'
+import { recipeQuery } from '../../../queries/mealQueries'
 export default function RecipeModal({ recipe, onClose }) {
-  const [result, setResult] = useState({
-    isLoading: true,
-  })
-  useEffect(() => {
-    setResult({ isLoading: true })
-
-    getRecipeById(recipe.idMeal)
-      .then((data) => {
-        setResult({ data })
-      })
-      .catch((error) => {
-        setResult({ error, isError: true })
-      })
-  }, [recipe.idMeal])
+  const result = useQuery(recipeQuery(recipe.idMeal))
 
   const meal = result.data?.meals?.[0]
   const planRecipe = useMealPlan(selectPlanRecipe)
@@ -48,9 +35,14 @@ export default function RecipeModal({ recipe, onClose }) {
     <>
       <h2>Ajouter une recette au planning</h2>
       <p>{recipe.strMeal}</p>
-      {result.isLoading && <p role="status">Chargement des ingrédients...</p>}
-      {result.isError && <p role="alert">{result.error.message}</p>}
-      {!result.isLoading && !result.isError && !meal && (
+      {result.isPending && <p role="status">Chargement des ingrédients...</p>}
+      {result.isError && (
+        <div role="alert">
+          <p>Impossible de charger les ingrédients : {result.error.message}</p>
+          <button onClick={result.refetch}>Réessayer</button>
+        </div>
+      )}
+      {!result.isPending && !result.isError && !meal && (
         <p>Recette introuvable.</p>
       )}
       <form onSubmit={submit}>
@@ -58,7 +50,7 @@ export default function RecipeModal({ recipe, onClose }) {
           Date de consommation{' '}
           <input name="date" type="datetime-local" required />
         </label>
-        <button disabled={!meal}>Ajouter</button>
+        <button disabled={!meal || result.isError}>Ajouter</button>
       </form>
     </>
   )

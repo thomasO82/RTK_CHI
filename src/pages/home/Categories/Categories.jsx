@@ -1,29 +1,19 @@
-import { useEffect, useState } from 'react'
-import { getCategories } from '../../../services/theMealDbApi'
+import { useQuery } from '@tanstack/react-query'
+import { categoriesQuery } from '../../../queries/mealQueries'
 export default function Categories({ categoryProp, setCategory }) {
-  const [categories, setCategories] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  useEffect(() => {
-    getCategories()
-      .then((data) => {
-        setCategories(data.categories ?? [])
-      })
-      .catch((error) => {
-        setError(error)
-      })
-      .finally(() => {
-        setLoading(false)
-      })
-  }, [])
-  if (loading) {
+  const { data, isPending, isError, error, refetch } = useQuery(categoriesQuery())
+  const categories = data?.categories ?? []
+  if (isPending) {
     return (
       <p role="status">Chargement des catégories...</p>
     )
   }
-  if (error) {
+  if (isError) {
     return (
-      <p role="alert">{error.message}</p>
+      <div role="alert">
+        <p>Impossible de charger les catégories : {error.message}</p>
+        <button onClick={refetch}>Réessayer</button>
+      </div>
     )
   }
   if (!categories.length) {

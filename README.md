@@ -1,6 +1,6 @@
-# RecipesI7 — TD3 : action de planification
+# RecipesI7 — TD5 : TanStack Query
 
-Application React adaptée progressivement aux cinq TD. La base actuelle du TD2 est conservée sur `td2-zustand` et le TD3 est réalisé sur `td3-planification`.
+Application React adaptée progressivement aux cinq TD. Cette branche `td5-tanstack-query` part du TD3 et ajoute la gestion des lectures TheMealDB avec TanStack Query.
 
 | Branche | Contenu ajouté |
 | --- | --- |
@@ -10,9 +10,32 @@ Application React adaptée progressivement aux cinq TD. La base actuelle du TD2 
 | td4-synchronisation | Suppression des ingrédients associés à une planification supprimée |
 | td5-tanstack-query | Lectures TheMealDB avec TanStack Query |
 
-Les branches disponibles dans ce dépôt sont `td2-zustand` et `td3-planification` ; les autres lignes indiquent les étapes du support. Pour revenir au TD2 : `git switch td2-zustand`.
+Les branches disponibles dans ce dépôt sont `td2-zustand`, `td3-planification` et `td5-tanstack-query` ; les autres lignes indiquent les étapes du support. Pour comparer avec la version précédente : `git diff td3-planification..td5-tanstack-query`.
 
 ## Cette étape
+
+`src/main.jsx` fournit un `QueryClientProvider` à toute l'application.
+Le client unique est créé dans `src/queries/queryClient.js`, en dehors des composants.
+Les clés et fonctions des requêtes sont regroupées dans `src/queries/mealQueries.js`.
+Les composants Categories, Recipes, RecipeDetails et RecipeModal utilisent `useQuery` au lieu de gérer les appels Axios dans un `useEffect`.
+
+| Lecture | Clé de cache |
+| --- | --- |
+| Catégories | `['categories']` |
+| Recettes d'une catégorie | `['recipes', 'category', category]` |
+| Recherche par nom | `['recipes', 'search', search]` |
+| Fiche et ingrédients de la modale | `['recipe', id]` |
+
+Chaque composant distingue le chargement (`isPending`), l'erreur (`isError`) et le résultat vide. Un bouton Réessayer relance une requête en erreur.
+Les données sont considérées fraîches pendant une minute (`staleTime: 60_000`) : rouvrir une fiche ou sa modale réutilise alors le cache sans nouvel appel HTTP. Une requête en échec est retentée une fois (`retry: 1`).
+
+## Inspecter TanStack Query
+
+Lancer `npm run dev`, puis ouvrir le site et cliquer sur l'icône TanStack Query en bas à droite.
+Les Devtools affichent les clés, l'état des requêtes et les données du cache. Elles sont disponibles en développement.
+Choisir une catégorie, lancer une recherche, ouvrir une fiche puis sa modale pour voir les entrées correspondantes. Revenir à la catégorie précédente en moins d'une minute permet de constater la réutilisation du cache dans l'onglet Réseau du navigateur.
+
+## Planning et courses
 
 Les recettes planifiées, les ingrédients et leurs actions sont regroupés dans le hook src/store/useMealPlan.js.
 Chaque planification possède son propre identifiant, distinct de l'identifiant TheMealDB.
@@ -34,7 +57,7 @@ Les lectures nécessitent un accès à TheMealDB.
 
 ## Code simplifié
 
-Les lectures HTTP utilisent Axios. Les données TheMealDB sont retournées telles quelles.
+Les lectures HTTP utilisent toujours Axios ; TanStack Query gère leur chargement, leurs erreurs et leur cache. Les données TheMealDB sont retournées telles quelles.
 Les fonctions `getIngredients` et `ingredientsForWeek` sont regroupées dans `src/utils/ingredients.js` pour extraire les ingrédients et filtrer ceux de la semaine.
 La modale attribue les identifiants et la date ; le hook Zustand ajoute, modifie ou supprime les données préparées.
 Les champs required du formulaire imposent une date.

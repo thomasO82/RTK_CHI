@@ -1,34 +1,25 @@
 import { Link, useParams } from 'react-router-dom'
 import useToggle from '@hooks/useToggle'
 import Recipe from '../../components/Recipe/Recipe'
-import { useEffect, useState } from 'react'
-import { getRecipeById } from '../../services/theMealDbApi'
+import { useQuery } from '@tanstack/react-query'
+import { recipeQuery } from '../../queries/mealQueries'
 import './recipeDetails.css'
 export default function RecipeDetails() {
   const { idRecipe } = useParams()
   const { toggle, handleToggle } = useToggle(false)
-  const [result, setResult] = useState({
-    isLoading: true,
-  })
-  useEffect(() => {
-    setResult({ isLoading: true })
-    getRecipeById(idRecipe)
-      .then((data) => {
-        setResult({ data })
-      })
-      .catch((error) => {
-        setResult({ error, isError: true })
-      })
-  }, [idRecipe])
+  const result = useQuery(recipeQuery(idRecipe))
 
-  if (result.isLoading) {
+  if (result.isPending) {
     return (
       <p role="status">Chargement de la recette...</p>
     )
   }
   if (result.isError) {
     return (
-      <p role="alert">{result.error.message}</p>
+      <div role="alert">
+        <p>Impossible de charger la recette : {result.error.message}</p>
+        <button onClick={result.refetch}>Réessayer</button>
+      </div>
     )
   }
   

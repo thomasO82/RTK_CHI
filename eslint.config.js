@@ -15,7 +15,7 @@ export default [
   },
   { ignores: ['dist', '.tmp'] },
   {
-    files: ['src/store/slices/*.js'],
+    files: ['src/store/slices/*.js', 'src/queries/*.js'],
     rules: { 'arrow-body-style': ['error', 'as-needed'] },
   },
   { files: ['tests/**/*.js'], languageOptions: { globals: globals.node } },
@@ -49,13 +49,5 @@ export default [
       "react/react-in-jsx-scope": "off",
       "react/prop-types": 0,
     },
-  },
-  {
-    files: [
-      'src/pages/home/Recipes/Recipes.jsx',
-      'src/pages/Recipe/RecipeDetails.jsx',
-      'src/pages/home/Recipes/RecipeModal.jsx',
-    ],
-    rules: { 'react-hooks/set-state-in-effect': 'off' },
   },
 ]
