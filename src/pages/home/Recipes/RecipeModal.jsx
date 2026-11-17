@@ -18,11 +18,8 @@ export default function RecipeModal({ recipe, onClose }) {
   }, [recipe.idMeal])
   
   const meal = result.data?.meals?.[0]
-  const addRecipe = useMealPlan((state) => {
-    return state.addRecipe
-  })
-  const addIngredients = useMealPlan((state) => {
-    return state.addIngredients
+  const planRecipe = useMealPlan((state) => {
+    return state.planRecipe
   })
   const submit = (event) => {
     event.preventDefault()
@@ -45,8 +42,7 @@ export default function RecipeModal({ recipe, onClose }) {
         recipe: meal.strMeal,
       }
     })
-    addRecipe(plan)
-    addIngredients(ingredients)
+    planRecipe(plan, ingredients)
     onClose()
   }
   return (

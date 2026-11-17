@@ -1,6 +1,12 @@
 export const createRecipeSlice = (set) => ({
   recipes: [],
 
+  planRecipe: (recipe, ingredients) =>
+    set((state) => ({
+      recipes: [...state.recipes, recipe],
+      ingredients: [...state.ingredients, ...ingredients],
+    })),
+
   addRecipe: (recipe) =>
     set((state) => ({
       recipes: [...state.recipes, recipe],

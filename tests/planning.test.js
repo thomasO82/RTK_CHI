@@ -3,6 +3,39 @@ import assert from 'node:assert/strict'
 import { useMealPlan, ingredientsForWeek, getIngredients } from '../src/store/useMealPlan.js'
 import { toDateInput } from '../src/utils/dates.js'
 
+test('planifier ajoute la recette et ses ingrédients en une seule notification', () => {
+  const firstPlan = { id: 'plan-1', mealId: '42', title: 'Soupe', date: 100 }
+  const firstIngredient = { id: 'ingredient-1', name: 'Carotte', planId: 'plan-1', date: 100 }
+  const recipes = [firstPlan]
+  const ingredients = [firstIngredient]
+  useMealPlan.setState({ recipes, ingredients })
+
+  const secondPlan = { id: 'plan-2', mealId: '42', title: 'Soupe', date: 200 }
+  const secondIngredients = [
+    { id: 'ingredient-2', name: 'Carotte', quantity: '2 kg', planId: 'plan-2', date: 200 },
+    { id: 'ingredient-3', name: 'Sel', quantity: '1 pincée', planId: 'plan-2', date: 200 },
+  ]
+  const notifications = []
+  const unsubscribe = useMealPlan.subscribe((state) => {
+    notifications.push({ recipes: state.recipes, ingredients: state.ingredients })
+  })
+
+  try {
+    useMealPlan.getState().planRecipe(secondPlan, secondIngredients)
+
+    assert.equal(notifications.length, 1)
+    assert.deepEqual(notifications[0], {
+      recipes: [firstPlan, secondPlan],
+      ingredients: [firstIngredient, ...secondIngredients],
+    })
+    assert.deepEqual(recipes, [firstPlan])
+    assert.deepEqual(ingredients, [firstIngredient])
+  } finally {
+    unsubscribe()
+    useMealPlan.setState({ recipes: [], ingredients: [] })
+  }
+})
+
 test('modifier puis supprimer une ligne conserve les autres ingrédients', () => {
   const first = { id: '1', name: 'Carotte', quantity: '2 kg', date: 100, planId: 'a' }
   const second = { id: '2', name: 'Sel', quantity: '1 pincée', date: 200, planId: 'b' }

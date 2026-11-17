@@ -1,6 +1,6 @@
-# RecipesI7 — TD2 : ingrédients et planning
+# RecipesI7 — TD3 : action de planification
 
-Application React adaptée progressivement aux cinq TD. Le code original est conservé sur main.
+Application React adaptée progressivement aux cinq TD. La base actuelle du TD2 est conservée sur `td2-zustand` et le TD3 est réalisé sur `td3-planification`.
 
 | Branche | Contenu ajouté |
 | --- | --- |
@@ -10,7 +10,7 @@ Application React adaptée progressivement aux cinq TD. Le code original est con
 | td4-synchronisation | Suppression des ingrédients associés à une planification supprimée |
 | td5-tanstack-query | Lectures TheMealDB avec TanStack Query |
 
-Chaque branche reprend la précédente. Pour changer : `git switch td1-vues`, puis `npm ci`.
+Les branches disponibles dans ce dépôt sont `td2-zustand` et `td3-planification` ; les autres lignes indiquent les étapes du support. Pour revenir au TD2 : `git switch td2-zustand`.
 
 ## Cette étape
 
@@ -21,7 +21,8 @@ Courses affiche la semaine locale courante, du lundi au dimanche, triée par con
 La quantité avec unité et la date sont modifiables, chaque ligne peut être supprimée.
 FullCalendar affiche les recettes et permet de supprimer une planification.
 
-À ce stade, la modale effectue deux mises à jour successives. L'action atomique arrive au TD3.
+La modale appelle maintenant `planRecipe(plan, ingredients)`, définie dans la slice des recettes.
+Cette action ajoute la recette et ses ingrédients dans un seul appel à `set` : les abonnés reçoivent les deux tableaux ensemble, en une seule notification.
 La suppression des ingrédients associés arrive au TD4. Le déplacement est un bonus non implémenté.
 L'état est en mémoire : un rechargement remet les données à zéro.
 
