@@ -1,10 +1,29 @@
-import { useQuery } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
 import { useMealPlan } from '../../../store/useMealPlan'
 import { selectPlanRecipe } from '../../../store/slices/recipeSlice'
 import { getIngredients } from '../../../utils/ingredients'
-import { recipeQuery } from '../../../queries/mealQueries'
+import { getRecipeById } from '../../../services/theMealDbApi'
 export default function RecipeModal({ recipe, onClose }) {
-  const result = useQuery(recipeQuery(recipe.idMeal))
+  const [result, setResult] = useState({ isLoading: true })
+
+  useEffect(() => {
+    let active = true
+    setResult({ isLoading: true })
+    getRecipeById(recipe.idMeal)
+      .then((data) => {
+        if (active) {
+          setResult({ data })
+        }
+      })
+      .catch((error) => {
+        if (active) {
+          setResult({ error, isError: true })
+        }
+      })
+    return () => {
+      active = false
+    }
+  }, [recipe.idMeal])
 
   const meal = result.data?.meals?.[0]
   const planRecipe = useMealPlan(selectPlanRecipe)
@@ -36,14 +55,11 @@ export default function RecipeModal({ recipe, onClose }) {
     <>
       <h2>Ajouter une recette au planning</h2>
       <p>{recipe.strMeal}</p>
-      {result.isPending && <p role="status">Chargement des ingrédients...</p>}
+      {result.isLoading && <p role="status">Chargement des ingrédients...</p>}
       {result.isError && (
-        <div role="alert">
-          <p>Impossible de charger les ingrédients : {result.error.message}</p>
-          <button onClick={result.refetch}>Réessayer</button>
-        </div>
+        <p role="alert">Impossible de charger les ingrédients : {result.error.message}</p>
       )}
-      {!result.isPending && !result.isError && !meal && (
+      {!result.isLoading && !result.isError && !meal && (
         <p>Recette introuvable.</p>
       )}
       <form onSubmit={submit}>

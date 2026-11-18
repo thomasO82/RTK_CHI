@@ -50,4 +50,12 @@ export default [
       "react/prop-types": 0,
     },
   },
+  {
+    files: [
+      'src/pages/home/Recipes/Recipes.jsx',
+      'src/pages/Recipe/RecipeDetails.jsx',
+      'src/pages/home/Recipes/RecipeModal.jsx',
+    ],
+    rules: { 'react-hooks/set-state-in-effect': 'off' },
+  },
 ]

@@ -1,13 +1,8 @@
-import test, { afterEach } from 'node:test'
+﻿import test, { afterEach } from 'node:test'
 import assert from 'node:assert/strict'
 import axios from 'axios'
 import { queryClient } from '../src/queries/queryClient.js'
-import {
-  categoriesQuery,
-  categoryRecipesQuery,
-  searchRecipesQuery,
-  recipeQuery,
-} from '../src/queries/mealQueries.js'
+import { categoriesQuery } from '../src/queries/mealQueries.js'
 
 const originalGet = axios.get
 
@@ -16,81 +11,48 @@ afterEach(() => {
   queryClient.clear()
 })
 
-test('catégories, catégories de recettes, recherches et fiches ont des caches distincts', async () => {
-  axios.get = async (url, { params } = {}) => {
-    if (url.endsWith('categories.php')) {
-      return { data: { categories: [{ idCategory: '1', strCategory: 'Beef' }] } }
-    }
-    if (url.endsWith('filter.php')) {
-      return { data: { meals: [{ idMeal: 'category', strMeal: params.c }] } }
-    }
-    if (url.endsWith('search.php')) {
-      return { data: { meals: [{ idMeal: 'search', strMeal: params.s }] } }
-    }
-    return { data: { meals: [{ idMeal: params.i }] } }
+test('les catégories partagent leur requête et le cache peut être actualisé', async () => {
+  let calls = 0
+  axios.get = async (url) => {
+    assert.equal(url, 'https://www.themealdb.com/api/json/v1/1/categories.php')
+    calls++
+    return { data: { categories: [{ idCategory: '1', strCategory: 'Beef' }] } }
   }
 
-  const queries = [
-    categoriesQuery(), categoryRecipesQuery('Beef'), categoryRecipesQuery('Chicken'),
-    searchRecipesQuery('Beef'), searchRecipesQuery('Chicken'),
-    recipeQuery('42'), recipeQuery('43'),
-  ]
-  const results = await Promise.all(queries.map((query) => queryClient.fetchQuery(query)))
-
-  assert.deepEqual(results, [
-    { categories: [{ idCategory: '1', strCategory: 'Beef' }] },
-    { meals: [{ idMeal: 'category', strMeal: 'Beef' }] },
-    { meals: [{ idMeal: 'category', strMeal: 'Chicken' }] },
-    { meals: [{ idMeal: 'search', strMeal: 'Beef' }] },
-    { meals: [{ idMeal: 'search', strMeal: 'Chicken' }] },
-    { meals: [{ idMeal: '42' }] },
-    { meals: [{ idMeal: '43' }] },
+  const [first, second] = await Promise.all([
+    queryClient.fetchQuery(categoriesQuery()),
+    queryClient.fetchQuery(categoriesQuery()),
   ])
+  assert.deepEqual(first, { categories: [{ idCategory: '1', strCategory: 'Beef' }] })
+  assert.deepEqual(second, first)
+  assert.equal(calls, 1)
+  assert.deepEqual(queryClient.getQueryData(['categories']), first)
+
+  axios.get = async () => ({ data: { categories: [{ idCategory: '2', strCategory: 'Chicken' }] } })
+  assert.deepEqual(await queryClient.fetchQuery(categoriesQuery()), {
+    categories: [{ idCategory: '2', strCategory: 'Chicken' }],
+  })
 })
 
-test('les appels simultanés sont partagés puis les données en cache sont actualisées', async () => {
+test('retry 1 retente les catégories une fois avant de signaler une erreur', async () => {
   let calls = 0
   axios.get = async () => {
     calls++
-    return { data: { meals: [{ idMeal: '42', strMeal: 'Soupe' }] } }
+    throw new Error('Service indisponible')
   }
 
-  const [details, modal] = await Promise.all([
-    queryClient.fetchQuery(recipeQuery('42')),
-    queryClient.fetchQuery(recipeQuery('42')),
-  ])
-  assert.deepEqual(details, { meals: [{ idMeal: '42', strMeal: 'Soupe' }] })
-  assert.deepEqual(modal, details)
-  assert.equal(calls, 1)
-  assert.deepEqual(queryClient.getQueryData(recipeQuery('42').queryKey), details)
-
-  axios.get = async () => {
-    calls++
-    return { data: { meals: [{ idMeal: '42', strMeal: 'Soupe corrigée' }] } }
-  }
-  assert.deepEqual(await queryClient.fetchQuery(recipeQuery('42')), {
-    meals: [{ idMeal: '42', strMeal: 'Soupe corrigée' }],
-  })
-  assert.equal(calls, 2)
-})
-
-test('une erreur réseau reste une erreur de requête et une nouvelle tentative peut réussir', async () => {
-  axios.get = async () => { throw new Error('Service indisponible') }
-  const query = { ...searchRecipesQuery('Soup'), retry: false }
-
+  const query = { ...categoriesQuery(), retryDelay: 0 }
   await assert.rejects(queryClient.fetchQuery(query), /Service indisponible/)
-  assert.equal(queryClient.getQueryState(query.queryKey).status, 'error')
-  assert.equal(queryClient.getQueryData(query.queryKey), undefined)
+  assert.equal(calls, 2)
+  assert.equal(queryClient.getQueryState(['categories']).status, 'error')
 
-  axios.get = async () => ({ data: { meals: [{ idMeal: '42' }] } })
-  assert.deepEqual(await queryClient.fetchQuery(query), { meals: [{ idMeal: '42' }] })
+  axios.get = async () => ({ data: { categories: [] } })
+  assert.deepEqual(await queryClient.fetchQuery(query), { categories: [] })
+  assert.equal(queryClient.getQueryState(['categories']).status, 'success')
 })
 
-test('un résultat vide reste un succès pour une recherche et une fiche introuvable', async () => {
-  axios.get = async () => ({ data: { meals: null } })
-
-  for (const query of [searchRecipesQuery('introuvable'), recipeQuery('missing')]) {
-    assert.deepEqual(await queryClient.fetchQuery(query), { meals: null })
-    assert.equal(queryClient.getQueryState(query.queryKey).status, 'success')
-  }
+test('une liste de catégories vide reste un succès', async () => {
+  axios.get = async () => ({ data: { categories: [] } })
+  assert.deepEqual(await queryClient.fetchQuery(categoriesQuery()), { categories: [] })
+  assert.equal(queryClient.getQueryState(['categories']).status, 'success')
 })
