@@ -1,5 +1,6 @@
 import axios from 'axios'
 const baseUrl = 'https://www.themealdb.com/api/json/v1/1/'
+
 export async function getCategories() {
   const response = await axios.get(baseUrl + 'categories.php')
   return response.data
