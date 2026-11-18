@@ -1,3 +1,8 @@
+export const selectIngredients = (state) => state.ingredients
+export const selectAddIngredients = (state) => state.addIngredients
+export const selectEditIngredient = (state) => state.editIngredient
+export const selectDeleteIngredient = (state) => state.deleteIngredient
+
 export const createIngredientSlice = (set) => ({
   ingredients: [],
 

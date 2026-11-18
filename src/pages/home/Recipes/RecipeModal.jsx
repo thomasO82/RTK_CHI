@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { useMealPlan, selectPlanRecipe } from '../../../store/useMealPlan'
+import { useMealPlan } from '../../../store/useMealPlan'
+import { selectPlanRecipe } from '../../../store/slices/recipeSlice'
 import { getIngredients } from '../../../utils/ingredients'
 import { recipeQuery } from '../../../queries/mealQueries'
 export default function RecipeModal({ recipe, onClose }) {

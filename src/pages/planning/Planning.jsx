@@ -7,16 +7,13 @@ import '@fullcalendar/react/themes/classic/palette.css'
 
 import { useState } from 'react'
 import { useMealPlan } from '../../store/useMealPlan'
+import { selectRecipes, selectDeleteRecipe } from '../../store/slices/recipeSlice'
 import useToggle from '../../hooks/useToggle'
 import Modal from '@components/Modal/Modal'
 import './planning.css'
 export default function Planning() {
-  const recipes = useMealPlan((state) => {
-    return state.recipes
-  })
-  const deleteRecipe = useMealPlan((state) => {
-    return state.deleteRecipe
-  })
+  const recipes = useMealPlan(selectRecipes)
+  const deleteRecipe = useMealPlan(selectDeleteRecipe)
   const { toggle, handleToggle } = useToggle(false)
   const [idRecipe, setIdRecipe] = useState(null)
   const showEvent = ({ event }) => {

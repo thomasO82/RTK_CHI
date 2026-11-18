@@ -1,11 +1,10 @@
 import { useMealPlan } from '../../store/useMealPlan'
+import { selectIngredients } from '../../store/slices/ingredientSlice'
 import { ingredientsForWeek } from '../../utils/ingredients'
 import IngredientCard from './IngredientCard'
 import './courses.css'
 export default function Courses() {
-  const allIngredients = useMealPlan((state) => {
-    return state.ingredients
-  })
+  const allIngredients = useMealPlan(selectIngredients)
   const ingredients = ingredientsForWeek(allIngredients)
   return (
     <section>

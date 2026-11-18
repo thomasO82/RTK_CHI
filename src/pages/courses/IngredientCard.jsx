@@ -1,14 +1,11 @@
 import { useState } from 'react'
 import { useMealPlan } from '../../store/useMealPlan'
+import { selectEditIngredient, selectDeleteIngredient } from '../../store/slices/ingredientSlice'
 import { toDateInput } from '../../utils/dates'
 export default function IngredientCard({ ingredient }) {
   const [editing, setEditing] = useState(false)
-  const editIngredient = useMealPlan((state) => {
-    return state.editIngredient
-  })
-  const deleteIngredient = useMealPlan((state) => {
-    return state.deleteIngredient
-  })
+  const editIngredient = useMealPlan(selectEditIngredient)
+  const deleteIngredient = useMealPlan(selectDeleteIngredient)
   const save = (event) => {
     event.preventDefault()
     const form = new FormData(event.currentTarget)

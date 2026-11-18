@@ -1,4 +1,7 @@
 export const selectPlanRecipe = (state) => state.planRecipe
+export const selectRecipes = (state) => state.recipes
+export const selectAddRecipe = (state) => state.addRecipe
+export const selectDeleteRecipe = (state) => state.deleteRecipe
 
 export const createRecipeSlice = (set) => ({
   recipes: [],

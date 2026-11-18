@@ -67,4 +67,4 @@ Les champs required du formulaire imposent une date.
 ## Organisation du store
 
 Toute la gestion Zustand est dans src/store : useMealPlan.js combine slices/recipeSlice.js et slices/ingredientSlice.js.
-Les sélecteurs sont exportés depuis useMealPlan.js. Les composants importent le hook commun ; chaque slice reçoit le même set.
+Les sélecteurs sont définis et exportés dans leur slice. Les composants importent directement les sélecteurs depuis `recipeSlice.js` ou `ingredientSlice.js`, et le hook commun depuis `useMealPlan.js`. Chaque slice reçoit le même `set`.
