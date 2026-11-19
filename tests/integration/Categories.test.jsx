@@ -29,3 +29,5 @@ describe('Categories : tests d’intégration', () => {
     expect(setCategory).toHaveBeenCalledWith('Chicken')
   })
 })
+
+
