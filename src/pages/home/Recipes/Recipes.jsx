@@ -1,42 +1,22 @@
-import { useEffect, useState } from 'react'
-import { getRecipesBySearch, getRecipesByCategory } from '../../../services/theMealDbApi'
+import { useQuery } from '@tanstack/react-query'
+import { searchRecipesQuery, categoryRecipesQuery } from '../../../queries/mealQueries'
 import RecipeCard from './RecipeCard'
 import './recipes.css'
 
 export default function Recipes({ category, search }) {
-  const [result, setResult] = useState({ isLoading: true })
+  const query = search ? searchRecipesQuery(search) : categoryRecipesQuery(category)
+  const { data, isPending, isError, error, refetch } = useQuery(query)
+  const recipes = data?.meals ?? []
 
-  useEffect(() => {
-    let active = true
-    setResult({ isLoading: true })
-    const request = search
-      ? getRecipesBySearch(search)
-      : getRecipesByCategory(category)
-
-    request
-      .then((data) => {
-        if (active) {
-          setResult({ data })
-        }
-      })
-      .catch((error) => {
-        if (active) {
-          setResult({ error, isError: true })
-        }
-      })
-
-    return () => {
-      active = false
-    }
-  }, [category, search])
-
-  const recipes = result.data?.meals ?? []
-  if (result.isLoading) {
+  if (isPending) {
     return <p role="status">Chargement des recettes...</p>
   }
-  if (result.isError) {
+  if (isError) {
     return (
-      <p role="alert">Impossible de charger les recettes : {result.error.message}</p>
+      <div role="alert">
+        <p>Impossible de charger les recettes : {error.message}</p>
+        <button onClick={refetch}>Réessayer</button>
+      </div>
     )
   }
 
